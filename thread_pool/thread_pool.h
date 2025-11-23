@@ -1,6 +1,7 @@
 #pragma once
 
 #include <future>
+#include <mutex>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -42,7 +43,7 @@ public:
         }
       };
 
-      this->threads_.emplace_back(worker);
+      this->threads_.emplace_back(std::move(worker));
     }
   };
 
@@ -60,8 +61,6 @@ public:
   template <class F, typename... Args>
   auto addTask(F &&task, Args &&...args)
       -> std::future<std::invoke_result_t<F, Args...>> {
-    std::unique_lock<std::mutex> lock(this->mutex_);
-
     auto func = std::bind(std::forward<F>(task), std::forward<Args>(args)...);
     auto packaged_task_ptr = std::make_shared<
         std::packaged_task<std::invoke_result_t<F, Args...>()>>(func);
@@ -71,8 +70,10 @@ public:
     // wrap the task to get rid of the return value to standardize it
     auto task_wrapper = [packaged_task_ptr] { (*packaged_task_ptr)(); };
 
-    this->queue_.emplace(std::move(task_wrapper));
-    lock.unlock();
+    {
+      std::lock_guard<std::mutex> lock(this->mutex_);
+      this->queue_.emplace(std::move(task_wrapper));
+    }
     this->condition_variable_.notify_one();
 
     return future;
