@@ -1,6 +1,6 @@
 # ThreadPool ImGui Demo Application
 
-This directory contains a fully functional demo application that showcases the ThreadPool library with ImGui debugging support.
+This directory contains demo applications that showcase the ThreadPool library with ImGui debugging support.
 
 ## Demo Applications
 
@@ -21,34 +21,40 @@ cmake --build .
 ./demo_app
 ```
 
-### 2. `demo_screenshot.cpp` - Automated Demo
-An automated version that runs for 15 seconds and captures screenshots at intervals. Used to generate the animated GIF for documentation.
+### 2. `demo_focused.cpp` - Monitor Window Only
+A focused demo that displays **only** the ThreadPool Monitor debug window created by `renderDebugWindow()` from `thread_pool_imgui.h`. This is used to generate the GIF for the README.
 
-**Build and Run:**
+**Features:**
+- No window decorations for clean screenshots
+- Window size: 420x280 (perfect fit for debug window)
+- Saves frames to `/tmp` (automatically cleaned up)
+- Runs for 15 seconds with varying workload
+
+**Generate GIF:**
 ```bash
-cd demo/build
-./demo_screenshot
+cd demo
+./generate_monitor_gif.sh
 ```
 
-## Demo Features
+This script:
+1. Runs `demo_focused` with virtual display (Xvfb)
+2. Captures 20 frames to `/tmp`
+3. Creates animated GIF at `../assets/threadpool_monitor.gif`
+4. Cleans up all temporary PNG files
+5. Only the final GIF remains
 
-The demo applications demonstrate:
+## What the Demo Shows
 
-- **Thread Pool with 8 Threads**: Shows realistic multi-threaded behavior
-- **Dynamic Task Addition**: Tasks are added with varying durations (200-1500ms)
-- **Real-Time Monitoring**: The debug window updates in real-time showing:
-  - Active threads (4/8, 8/8, etc.)
-  - Current queue size
-  - Tasks completed counter
-  - Thread utilization percentage with progress bar
-  - Color-coded status indicators
-- **ImGui Integration**: Full ImGui context with GLFW/OpenGL3 backend
-
-## Visual Assets
-
-- **`threadpool_demo.gif`**: Animated GIF showing the debug window in action (20 frames, 50ms delay)
-- **`screenshot_*.png`**: Individual frames captured during demo execution
-- **`assets/demo_screenshot.png`**: Representative screenshot used in documentation
+The ThreadPool Monitor window displays:
+- **Active Threads**: Number of threads currently executing tasks (e.g., "8 / 8")
+- **Queue Size**: Number of tasks waiting in the queue
+- **Tasks Completed**: Cumulative count of finished tasks
+- **Utilization**: Percentage bar showing thread usage
+- **Status**: Color-coded indicator:
+  - 🟢 **ACTIVE** (green): Threads are working
+  - 🟡 **IDLE (Tasks Queued)** (yellow): Tasks waiting, no active threads
+  - 🟠 **BUSY (Queue Backlog)** (orange): All threads active + queue has tasks
+  - ⚪ **IDLE** (gray): No activity
 
 ## Requirements
 
@@ -57,27 +63,16 @@ The demo applications demonstrate:
 - ImGui (cloned from official repository)
 - C++20 compiler
 - CMake 3.10+
-
-## How It Works
-
-The demo creates a ThreadPool with 8 worker threads and continuously adds tasks with random durations. The ImGui debug window (`renderDebugWindow()`) is called every frame to display real-time statistics.
-
-The debug window shows:
-1. **Active Threads**: Number of threads currently executing tasks
-2. **Queue Size**: Number of tasks waiting in the queue
-3. **Tasks Completed**: Cumulative count of finished tasks
-4. **Utilization**: Percentage of threads currently active
-5. **Status**: Color-coded indicator (IDLE, ACTIVE, BUSY)
+- Xvfb (for GIF generation)
+- ImageMagick (for GIF creation)
 
 ## Building from Scratch
 
-If you want to build the demo from scratch:
-
 ```bash
 # Install dependencies
-sudo apt-get install libglfw3-dev libgl1-mesa-dev
+sudo apt-get install libglfw3-dev libgl1-mesa-dev xvfb imagemagick
 
-# Clone ImGui
+# Clone ImGui (if not already cloned)
 cd /path/to/parent/directory
 git clone https://github.com/ocornut/imgui.git
 
@@ -87,13 +82,30 @@ mkdir build && cd build
 cmake ..
 cmake --build .
 
-# Run
+# Run interactive demo
 ./demo_app
+
+# Or generate GIF
+cd ..
+./generate_monitor_gif.sh
+```
+
+## File Structure
+
+```
+demo/
+├── demo_app.cpp              # Interactive demo with controls
+├── demo_focused.cpp          # Focused demo (monitor window only)
+├── demo_screenshot.cpp       # Legacy: full demo with screenshots
+├── generate_monitor_gif.sh   # Script to generate GIF for README
+├── CMakeLists.txt           # Build configuration
+├── stb_image_write.h        # Image writing library
+└── README.md                # This file
 ```
 
 ## Notes
 
-- The demo uses Xvfb (virtual framebuffer) for headless screenshot capture
-- ImageMagick is used to create the animated GIF from screenshots
-- The demo automatically exits after 15 seconds (screenshot version)
-- The interactive version runs until you close the window
+- The focused demo saves screenshots to `/tmp` to avoid cluttering the repo
+- Only the final GIF (`assets/threadpool_monitor.gif`) is kept in the repository
+- The GIF is 60KB and shows 20 frames over 10 seconds
+- The demo automatically exits after 15 seconds

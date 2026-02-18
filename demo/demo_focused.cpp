@@ -113,12 +113,11 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        // Save screenshots at intervals
+        // Save screenshots at intervals to /tmp
         if (frame_count % 30 == 0 && screenshot_count < 20) {
             char filename[256];
-            snprintf(filename, sizeof(filename), "/home/ubuntu/Thread-Pool/demo/focused_%03d.png", screenshot_count);
+            snprintf(filename, sizeof(filename), "/tmp/threadpool_frame_%03d.png", screenshot_count);
             saveScreenshot(window, filename);
-            std::cout << "Saved: " << filename << std::endl;
             screenshot_count++;
         }
 
