@@ -99,9 +99,9 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Control window
-        ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(400, 350), ImGuiCond_FirstUseEver);
+        // Control window - positioned on the left
+        ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(380, 400), ImGuiCond_Always);
         ImGui::Begin("ThreadPool Demo Controls");
         
         ImGui::TextColored(ImVec4(0.2f, 1.0f, 0.4f, 1.0f), "ThreadPool ImGui Debug Demo");
@@ -135,9 +135,9 @@ int main() {
         
         ImGui::End();
 
-        // ThreadPool debug window
-        ImGui::SetNextWindowPos(ImVec2(450, 20), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowSize(ImVec2(350, 250), ImGuiCond_FirstUseEver);
+        // ThreadPool debug window - positioned on the right, no overlap
+        ImGui::SetNextWindowPos(ImVec2(420, 20), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(380, 300), ImGuiCond_Always);
         pool.renderDebugWindow("ThreadPool Monitor");
 
         ImGui::Render();

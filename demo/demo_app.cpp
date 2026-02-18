@@ -96,7 +96,9 @@ int main() {
             }
         }
 
-        // Main control window
+        // Main control window - positioned on the left
+        ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(400, 500), ImGuiCond_FirstUseEver);
         ImGui::Begin("ThreadPool Demo Controls");
         
         ImGui::Text("Welcome to the ThreadPool ImGui Debug Demo!");
@@ -142,10 +144,14 @@ int main() {
         
         ImGui::End();
 
-        // Render the ThreadPool debug window
+        // Render the ThreadPool debug window - positioned on the right
+        ImGui::SetNextWindowPos(ImVec2(440, 20), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(380, 300), ImGuiCond_FirstUseEver);
         pool.renderDebugWindow("ThreadPool Monitor");
 
-        // Show ImGui demo window for reference
+        // Show ImGui demo window for reference - positioned at bottom right
+        ImGui::SetNextWindowPos(ImVec2(440, 340), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(380, 360), ImGuiCond_FirstUseEver);
         ImGui::ShowDemoWindow();
 
         // Rendering
