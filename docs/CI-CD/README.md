@@ -13,7 +13,7 @@ To enable CI/CD for this repository:
 
 2. Copy the workflow file:
    ```bash
-   cp docs/ci-cd/ci.yml .github/workflows/
+   cp docs/CI-CD/ci.yml .github/workflows/
    ```
 
 3. Commit and push:

@@ -5,7 +5,7 @@
 
 A C++ thread pool library with optional ImGui debugging support.
 
-> **Note**: CI/CD workflow configuration is available in `docs/ci-cd/`. See the [CI/CD Setup Guide](docs/ci-cd/README.md) for instructions.
+> **Note**: CI/CD workflow configuration is available in `docs/CI-CD/`. See the [CI/CD Setup Guide](docs/CI-CD/README.md) for instructions.
 
 ## Features
 
