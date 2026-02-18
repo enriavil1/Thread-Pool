@@ -1,5 +1,9 @@
 # Thread-Pool
 
+[![CI](https://github.com/enriavil1/Thread-Pool/actions/workflows/ci.yml/badge.svg)](https://github.com/enriavil1/Thread-Pool/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
+
 A C++ thread pool library with optional ImGui debugging support.
 
 ## Features
