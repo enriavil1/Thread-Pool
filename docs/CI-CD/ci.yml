@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build and Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        build_type: [Release, Debug]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up CMake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.20'
+        
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DTHREADPOOL_BUILD_TESTS=ON
+      
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }}
+      
+    - name: Run Tests
+      run: |
+        cd build
+        ctest -C ${{ matrix.build_type }} --output-on-failure --verbose
+      
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.build_type }}
+        path: build/Testing/Temporary/
+        retention-days: 7
+
+  build-with-imgui-debug:
+    name: Build with ImGui Debug (Ubuntu)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libglfw3-dev libgl1-mesa-dev
+        
+    - name: Clone ImGui
+      run: |
+        git clone --depth 1 https://github.com/ocornut/imgui.git /tmp/imgui
+        
+    - name: Configure CMake with ImGui Debug
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DTHREADPOOL_ENABLE_IMGUI_DEBUG=ON -DTHREADPOOL_BUILD_TESTS=ON
+      
+    - name: Build
+      run: cmake --build build
+      
+    - name: Run Tests
+      run: |
+        cd build
+        ctest --output-on-failure --verbose
+
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lcov
+        
+    - name: Configure CMake with coverage
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DTHREADPOOL_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="--coverage"
+      
+    - name: Build
+      run: cmake --build build
+      
+    - name: Run Tests
+      run: |
+        cd build
+        ctest --output-on-failure
+        
+    - name: Generate coverage report
+      run: |
+        lcov --capture --directory build --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+        lcov --list coverage.info
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.info
+        fail_ci_if_error: false
+        verbose: true
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install cppcheck
+      run: sudo apt-get update && sudo apt-get install -y cppcheck
+      
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --inconclusive --std=c++20 \
+          --suppress=missingIncludeSystem \
+          --suppress=unusedFunction \
+          thread_pool/ tests/ example/ 2>&1 | tee cppcheck-report.txt
+        
+    - name: Upload cppcheck report
+      uses: actions/upload-artifact@v4
+      with:
+        name: cppcheck-report
+        path: cppcheck-report.txt
+        retention-days: 30
