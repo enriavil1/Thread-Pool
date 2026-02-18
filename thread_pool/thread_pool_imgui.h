@@ -16,7 +16,6 @@ inline void ThreadPool::renderDebugWindow(const char* window_name) const {
   size_t active = getActiveThreadCount();
   size_t total = getTotalThreadCount();
   size_t queue_size = getQueueSize();
-  size_t completed = getTasksCompleted();
   
   // Active threads display
   ImGui::Text("Active Threads: %zu / %zu", active, total);
@@ -29,7 +28,6 @@ inline void ThreadPool::renderDebugWindow(const char* window_name) const {
   
   // Queue information
   ImGui::Text("Queue Size: %zu", queue_size);
-  ImGui::Text("Tasks Completed: %zu", completed);
   
   ImGui::Spacing();
   ImGui::Separator();
