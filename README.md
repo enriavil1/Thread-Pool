@@ -31,6 +31,12 @@ int result = future.get();
 
 The library includes an optional ImGui debugging window that displays real-time statistics about thread usage and task queue status.
 
+### Demo
+
+![ThreadPool ImGui Debug Demo](assets/threadpool_demo.gif)
+
+*The debug window shows real-time thread activity, queue size, utilization percentage, and color-coded status indicators.*
+
 ### Enabling ImGui Debug Support
 
 To enable the ImGui debugging window, set the CMake option when configuring your project:
