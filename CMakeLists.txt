@@ -11,6 +11,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Option to enable ImGui debugging window
 option(THREADPOOL_ENABLE_IMGUI_DEBUG "Enable ImGui debugging window for ThreadPool" OFF)
 
+# Option to build tests
+option(THREADPOOL_BUILD_TESTS "Build ThreadPool tests" ON)
+
 set(PROJECT_FILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool/thread_pool.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thread_pool/thread_pool_imgui.h)
@@ -26,4 +29,10 @@ if(THREADPOOL_ENABLE_IMGUI_DEBUG)
     
     # Note: ImGui must be provided by the consuming project
     # The user should link ImGui to their executable/library
+endif()
+
+# Add tests if enabled (only when building as main project)
+if(THREADPOOL_BUILD_TESTS AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    enable_testing()
+    add_subdirectory(tests)
 endif()
