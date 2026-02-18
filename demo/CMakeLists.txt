@@ -56,3 +56,19 @@ target_link_libraries(demo_screenshot PRIVATE
     OpenGL::GL
     glfw
 )
+
+# Create focused demo executable (only debug window)
+add_executable(demo_focused demo_focused.cpp ${IMGUI_SOURCES})
+
+target_include_directories(demo_focused PRIVATE
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(demo_focused PRIVATE
+    MultiThreadLib
+    OpenGL::GL
+    glfw
+)

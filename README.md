@@ -33,9 +33,9 @@ The library includes an optional ImGui debugging window that displays real-time 
 
 ### Demo
 
-![ThreadPool ImGui Debug Demo](assets/threadpool_demo.gif)
+![ThreadPool Monitor Debug Window](assets/threadpool_monitor.gif)
 
-*The debug window shows real-time thread activity, queue size, utilization percentage, and color-coded status indicators.*
+*The ThreadPool Monitor window displays real-time statistics: active threads (8/8), queue size (29), tasks completed, utilization (100%), and color-coded status indicator showing "BUSY (Queue Backlog)" when all threads are active with pending tasks.*
 
 ### Enabling ImGui Debug Support
 
