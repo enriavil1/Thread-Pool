@@ -1,3 +1,4 @@
 build/
 .cache
 .git
+example/stb_image_write.h

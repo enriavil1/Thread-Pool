@@ -20,12 +20,21 @@ set(IMGUI_SOURCES
     ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
+# Download stb_image_write.h if not present
+if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/stb_image_write.h)
+    file(DOWNLOAD
+        https://raw.githubusercontent.com/nothings/stb/master/stb_image_write.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/stb_image_write.h
+        SHOW_PROGRESS
+    )
+endif()
+
 # Add the library with ImGui debug enabled
 set(THREADPOOL_ENABLE_IMGUI_DEBUG ON CACHE BOOL "Enable ImGui debugging" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_BINARY_DIR}/thread_pool)
 
 # Create focused demo executable (only debug window)
-add_executable(demo_focused demo_focused.cpp ${IMGUI_SOURCES})
+add_executable(demo_focused main.cpp ${IMGUI_SOURCES})
 
 target_include_directories(demo_focused PRIVATE
     ${IMGUI_DIR}
