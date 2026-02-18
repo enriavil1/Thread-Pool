@@ -1,7 +1,11 @@
 #pragma once
 
+#include <atomic>
+#include <condition_variable>
+#include <functional>
 #include <future>
 #include <mutex>
+#include <queue>
 #include <thread>
 #include <type_traits>
 #include <utility>
@@ -20,8 +24,13 @@ private:
 
   bool shutdown_requested_ = false;
 
+  // Debug tracking (minimal overhead even when ImGui is disabled)
+  std::atomic<size_t> active_threads_{0};
+  std::atomic<size_t> tasks_completed_{0};
+  size_t total_threads_{0};
+
 public:
-  ThreadPool(int amount_of_threads) {
+  ThreadPool(int amount_of_threads) : total_threads_(amount_of_threads) {
     this->threads_.reserve(amount_of_threads);
     for (int i = 0; i < amount_of_threads; ++i) {
       auto worker = [this] {
@@ -39,7 +48,12 @@ public:
           auto task = std::move(this->queue_.front());
           this->queue_.pop();
           lock.unlock();
+          
+          // Track active thread
+          ++active_threads_;
           task();
+          --active_threads_;
+          ++tasks_completed_;
         }
       };
 
@@ -78,5 +92,24 @@ public:
 
     return future;
   };
+
+  // Getter methods for debug information
+  size_t getActiveThreadCount() const { return active_threads_.load(); }
+  size_t getTotalThreadCount() const { return total_threads_; }
+  size_t getTasksCompleted() const { return tasks_completed_.load(); }
+  size_t getQueueSize() const {
+    std::lock_guard<std::mutex> lock(this->mutex_);
+    return queue_.size();
+  }
+
+#ifdef THREADPOOL_IMGUI_DEBUG
+  // ImGui debug window rendering
+  void renderDebugWindow(const char* window_name = "ThreadPool Debug") const;
+#endif
 };
 } // namespace multithreads
+
+// Include ImGui implementation if debug is enabled
+#ifdef THREADPOOL_IMGUI_DEBUG
+#include "thread_pool_imgui.h"
+#endif
